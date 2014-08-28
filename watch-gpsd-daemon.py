@@ -1,9 +1,10 @@
 import gps
- 
+from datetime import datetime
+
 # Listen on port 2947 (gpsd) of localhost
 session = gps.gps("localhost", "2947")
 session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
- 
+
 # main (infinite) loop
 while True:
     try:
@@ -15,6 +16,7 @@ while True:
         if report['class'] == 'TPV':
             if hasattr(report, 'time'):
                 print report.time
+                print datetime.now()
     except KeyError:
                 pass
     except KeyboardInterrupt:

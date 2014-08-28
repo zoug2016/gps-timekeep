@@ -5,29 +5,35 @@
 #   License: GPL 2.0
 
 import os
-from gps import *
+import gps
 from time import *
 import time
 import threading
 
-gpsd = None #seting the global variable
+# declare global vars
+gpsd = None
+gpsd_tpv = None
+gpsd_sat = None
 
 os.system('clear') #clear the terminal (optional)
 
 class GpsPoller(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
-    global gpsd #bring it in scope
-    gpsd = gps(mode=WATCH_ENABLE) #starting the stream of info
+    # connect to gpsd
+    self.session = gps.gps("localhost", "2947")
+    self.session.stream(gps.WATCH_ENABLE) #  | gps.WATCH_NEWSTYLE
     self.current_value = None
-    self.running = True #setting the thread running to true
+    self.running = True # setting the thread running to true
 
   def run(self):
-    global gpsd
     while self.running:
       # this will continue to loop and grab EACH set of gpsd info to clear the buffer
       # next() is blocking, so it will wait for the next report if needed
-      gpsd.next()
+      self.session.next()
+      # export the current report to a global variable
+      global gpsd
+      gpsd = self.session
 
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
@@ -61,7 +67,8 @@ if __name__ == '__main__':
 
       time.sleep(5) #set to whatever
 
-  except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
+  # when ctrl+c pressed, or gpsd quits
+  except (KeyboardInterrupt, SystemExit, StopIteration):
     print "\nKilling Thread..."
     gpsp.running = False
     gpsp.join() # wait for the thread to finish what it's doing
