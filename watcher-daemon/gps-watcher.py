@@ -10,7 +10,7 @@ import xmlrpclib
 import time
 import subprocess
 import datetime
-#import os
+import os
 
 # declare global vars and constants
 gpsd = None
@@ -21,7 +21,8 @@ rpi_gpio_ntp_running = None
 NTPD_NAME = "ntpd"
 RPI_GPIO_NTP_NAME = "rpi_gpio_ntp"
 
-HTML_OUTPUT_FILE = "/tmp/index.html"
+HTML_OUTPUT_DIR = "/run/www"
+HTML_OUTPUT_FILE = "/index.html"
 HTML_TEMPLATE_FILE = "index.template.html"
 
 # auxiliary functions: for supervisord
@@ -49,6 +50,9 @@ gps_signal_states = {
         2: True,  # 2D fix
         3: True,  # 3D fix
         }
+# preparation: create the dir for html output
+if not os.path.exists(HTML_OUTPUT_DIR):
+    os.makedirs(HTML_OUTPUT_DIR)
 
 # preparation: read the html template file
 fin = open(HTML_TEMPLATE_FILE)
@@ -60,10 +64,10 @@ def generate_html_file():
     # gather the info
     gps_info = str(gpsd)
     gps_has_fix = "Yes" if gps_has_signal else "No"
-    ntp_info = subprocess.check_output(["ntpq", "-pn"])
+    ntp_info = subprocess.check_output(["ntpq", "-pn"], stderr=subprocess.STDOUT)
     current_time = datetime.datetime.now()
     # write the output file, substituting the variables
-    fout = open(HTML_OUTPUT_FILE, "w")
+    fout = open(HTML_OUTPUT_DIR+HTML_OUTPUT_FILE, "w")
     fout.write(html_template.format(**locals()))
     fout.close()
 

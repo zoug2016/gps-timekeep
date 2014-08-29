@@ -3,16 +3,34 @@
   <meta content="text/html; charset=utf-8;" http-equiv="Content-Type">
   <body>
     <h1>ntpi info</h1>
-    <p>GPS Signal: <strong>{gps_has_fix}</strong></p>
-    <p>GPS info:
-      <pre>{gps_info}</pre>
-    </p>
-    <p>Current time: {current_time} (when the page was generated, will differ from the GPS time!)</p>
-    <p>NTP daemon info (will say "connection refused" if the daemon is not running):
-      <pre>{ntp_info}</pre>
-    </p>
-    <p>This page is updated every 2-3 seconds.</p>
-    <h3>Links</h3>
-    <a href="#" onclick="javascript:event.target.port=9001">Supervisor (daemon management/status)</a></br>
+    <h3>GPS Signal: <span style="font-size: 130%;">{gps_has_fix}</span></h3>
+    <h3>GPS info</h3>
+    <blockquote><pre>{gps_info}</pre></blockquote>
+    <h3>Current server time</h3>
+    <blockquote>
+      {current_time} (when this page was generated, will differ from the GPS time!)
+    </blockquote>
+    <h3>NTP daemon info</h3>
+    <blockquote><pre>{ntp_info}</pre></blockquote>
+    <blockquote>Notes:
+      <ul>
+        <li>It will say "connection refused" if the daemon is not running.</li>
+        <li>The very first column indicates which sources are used: "*" means the main source, "+" means also used, "x" means <i>not used</i>.
+        <li><i>offset</i> says how many microseconds is that source off from the time NTP daemon uses.</li>
+        <li><i>UPPS</i> is the "user mode PPS", this uses the precise PPS signal from GPS.</li>
+        <li><i>SHM</i> is the "coarse" time signal from GPS.
+      </ul>
+    </blockquote>
+    <p>This page is updated every 2-3 seconds (reload manually).</p>
+    <h3>Management</h3>
+    <a href="#" onclick="javascript:event.target.port=9001">Supervisor (daemon status/management)</a>
+    <blockquote>Notes:
+      <ul>
+        <li><i>gpsd</i>, <i>gps-watcher</i> and <i>lighttpd</i> should be always running</li>
+        <li><i>gps-watcher</i> needs to be restarted after every restart of <i>gpsd</i></li>
+        <li><i>gps-watcher</i> will start <i>ntpd</i> and <i>rpi_gpio_ntp</i> if GPS has a fix (in 2-3 seconds)</li>
+        <li><i>gps-watcher</i> will stop <i>ntpd</i> and <i>rpi_gpio_ntp</i> if GPS does <i>not</i> have a fix</li>
+      </ul>
+    </blockquote>
   </body>
 </html>
