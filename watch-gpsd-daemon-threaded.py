@@ -6,14 +6,16 @@
 
 import os
 import gps
+import threading
+import xmlrpclib
 from time import *
 import time
-import threading
 
 # declare global vars
 gpsd = None
-gpsd_tpv = None
-gpsd_sat = None
+
+# connect to supervisor
+supervisord = xmlrpclib.Server('http://localhost:9001/RPC2')
 
 os.system('clear') #clear the terminal (optional)
 
@@ -22,7 +24,7 @@ class GpsPoller(threading.Thread):
     threading.Thread.__init__(self)
     # connect to gpsd
     self.session = gps.gps("localhost", "2947")
-    self.session.stream(gps.WATCH_ENABLE) #  | gps.WATCH_NEWSTYLE
+    self.session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
     self.current_value = None
     self.running = True # setting the thread running to true
 
@@ -34,6 +36,14 @@ class GpsPoller(threading.Thread):
       # export the current report to a global variable
       global gpsd
       gpsd = self.session
+      # note to self: does not export individual reports;
+      # the 'session' holds the "current" info
+      # the individual reports are return values to the
+      # self.session.next() call
+      # --- to print all the callable methods of an object:
+      #print [method for method in dir(gpsd) if callable(getattr(gpsd, method))]
+      # --- to print all the properties of an object:
+      #print dir(gpsd.fix)
 
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
@@ -47,25 +57,11 @@ if __name__ == '__main__':
 
       os.system('clear')
 
-      print
-      print ' GPS reading'
-      print '----------------------------------------'
-      print 'latitude    ' , gpsd.fix.latitude
-      print 'longitude   ' , gpsd.fix.longitude
-      print 'time utc    ' , gpsd.utc,' + ', gpsd.fix.time
-      print 'altitude (m)' , gpsd.fix.altitude
-      print 'eps         ' , gpsd.fix.eps
-      print 'epx         ' , gpsd.fix.epx
-      print 'epv         ' , gpsd.fix.epv
-      print 'ept         ' , gpsd.fix.ept
-      print 'speed (m/s) ' , gpsd.fix.speed
-      print 'climb       ' , gpsd.fix.climb
-      print 'track       ' , gpsd.fix.track
-      print 'mode        ' , gpsd.fix.mode
-      print
-      print 'sats        ' , gpsd.satellites
+      print gpsd
 
-      time.sleep(5) #set to whatever
+      #print gpsd.fix.mode
+
+      time.sleep(3) #set to whatever
 
   # when ctrl+c pressed, or gpsd quits
   except (KeyboardInterrupt, SystemExit, StopIteration):
