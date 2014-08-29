@@ -48,7 +48,11 @@ class GpsPoller(threading.Thread):
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
   try:
+    time.sleep(1) # give gpsd some time to start (in case we start simultaneously)
     gpsp.start() # start it up
+
+    time.sleep(3) # wait for a few reports to come in, to get a possible fix
+                  # so that we don't kill ntpd unnecessarily
 
     # main infinite loop
     while True:
