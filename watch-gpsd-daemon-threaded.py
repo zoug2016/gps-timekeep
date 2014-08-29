@@ -9,6 +9,7 @@ import threading
 import xmlrpclib
 import time
 import subprocess
+import datetime
 #import os
 
 # declare global vars and constants
@@ -60,6 +61,7 @@ def generate_html_file():
     gps_info = str(gpsd)
     gps_has_fix = "Yes" if gps_has_signal else "No"
     ntp_info = subprocess.check_output(["ntpq", "-pn"])
+    current_time = datetime.datetime.now()
     # write the output file, substituting the variables
     fout = open(HTML_OUTPUT_FILE, "w")
     fout.write(html_template.format(**locals()))
