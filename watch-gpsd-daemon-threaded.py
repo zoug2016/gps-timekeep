@@ -8,17 +8,69 @@ import os
 import gps
 import threading
 import xmlrpclib
-from time import *
 import time
+import subprocess
 
-# declare global vars
+# declare global vars and constants
 gpsd = None
+gps_has_signal = None
+ntpd_running = None
+rpi_gpio_ntp_running = None
+
+NTPD_NAME = "ntpd"
+RPI_GPIO_NTP_NAME = "rpi_gpio_ntp"
+
+HTML_OUTPUT_FILE = "/tmp/index.html"
+HTML_TEMPLATE_FILE = "index.template.html"
+
+# auxiliary functions: for supervisord
+supervisor_states = {
+        0: False,   # stopped
+        10: True,   # starting
+        20: True,   # running
+        30: False,  # backoff (exited too quickly)
+        40: False,  # stopping
+        100: False, # exited
+        200: False, # fatal (could not be started)
+        1000: False,# unknown/supervisord programming error
+        }
+def is_process_running(name):
+    return supervisor_states[supervisord.supervisor.getProcessInfo(name)['state']]
+def stop_process(name):
+    return supervisord.supervisor.stopProcess(name)
+def start_process(name):
+    return supervisord.supervisor.startProcess(name)
+
+# auxiliary defn: for converting the mode from gpsd into "do we have fix?" boolean
+gps_signal_states = {
+        0: False, # no mode value yet seen
+        1: False, # no fix
+        2: True,  # 2D fix
+        3: True,  # 3D fix
+        }
+
+# preparation: read the html template file
+fin = open(HTML_TEMPLATE_FILE)
+html_template = fin.read()
+fin.close()
+
+# auxiliary function: generate a webpage with basic gps/ntpd info
+def generate_html_file():
+    # gather the info
+    gps_info = str(gpsd)
+    gps_has_fix = "Yes" if gps_has_signal else "No"
+    ntp_info = subprocess.check_output(["ntpq", "-pn"])
+    # write the output file, substituting the variables
+    fout = open(HTML_OUTPUT_FILE, "w")
+    fout.write(html_template.format(**locals()))
+    fout.close()
+
+generate_html_file()
 
 # connect to supervisor
 supervisord = xmlrpclib.Server('http://localhost:9001/RPC2')
 
-os.system('clear') #clear the terminal (optional)
-
+# this class does the threaded polling of the gpsd daemon
 class GpsPoller(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -56,14 +108,30 @@ if __name__ == '__main__':
 
         # main infinite loop
         while True:
+            # does GPS have a fix?
+            gps_has_signal = gps_signal_states[gpsd.fix.mode]
+            # get the current status of daemons
+            ntpd_running = is_process_running(NTPD_NAME)
+            rpi_gpio_ntp_running = is_process_running(RPI_GPIO_NTP_NAME)
+
+            # check if the daemons should be running
+            if gps_has_signal:
+                if not(rpi_gpio_ntp_running):
+                    start_process(RPI_GPIO_NTP_NAME)
+                if not(ntpd_running):
+                    start_process(NTPD_NAME)
+            else:
+                if rpi_gpio_ntp_running:
+                    stop_process(RPI_GPIO_NTP_NAME)
+                if ntpd_running:
+                    stop_process(NTPD_NAME)
 
             os.system('clear')
 
             print gpsd
 
-            #print gpsd.fix.mode
-
-            time.sleep(3) #set to whatever
+            # wait for X seconds until the next cycle
+            time.sleep(2)
 
     # when ctrl+c pressed, or gpsd quits
     except (KeyboardInterrupt, SystemExit, StopIteration):
