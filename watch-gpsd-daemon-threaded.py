@@ -4,12 +4,12 @@
 #   Dan Mandle http://dan.mandle.me September 2012
 #   License: GPL 2.0
 
-import os
 import gps
 import threading
 import xmlrpclib
 import time
 import subprocess
+#import os
 
 # declare global vars and constants
 gpsd = None
@@ -64,8 +64,6 @@ def generate_html_file():
     fout = open(HTML_OUTPUT_FILE, "w")
     fout.write(html_template.format(**locals()))
     fout.close()
-
-generate_html_file()
 
 # connect to supervisor
 supervisord = xmlrpclib.Server('http://localhost:9001/RPC2')
@@ -126,9 +124,10 @@ if __name__ == '__main__':
                 if ntpd_running:
                     stop_process(NTPD_NAME)
 
-            os.system('clear')
+            generate_html_file()
 
-            print gpsd
+            #os.system('clear')
+            #print gpsd
 
             # wait for X seconds until the next cycle
             time.sleep(2)

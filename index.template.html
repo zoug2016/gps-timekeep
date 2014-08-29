@@ -1,0 +1,17 @@
+<html>
+  <title>ntpi info</title>
+  <meta content="text/html; charset=utf-8;" http-equiv="Content-Type">
+  <body>
+    <h1>ntpi info</h1>
+    <p>GPS Signal: <strong>{gps_has_fix}</strong></p>
+    <p>GPS info:
+      <pre>{gps_info}</pre>
+    </p>
+    <p>NTP daemon info (will say "connection refused" if the daemon is not running):
+      <pre>{ntp_info}</pre>
+    </p>
+    <p>This page is updated every 2-3 seconds.</p>
+    <h3>Links</h3>
+    <a href="#" onclick="javascript:event.target.port=9001">Supervisor (daemon management/status)</a></br>
+  </body>
+</html>
