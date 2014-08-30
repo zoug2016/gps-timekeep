@@ -41,11 +41,14 @@ while True:
                 # print report
         if report['class'] == 'TPV':
             if hasattr(report, 'time'):
+                # this is a hacky way to add 0.7sec (which is more-less the time
+                #   it takes from the GPS report to get to here)
+                os.system('date --set="'+report.time[:20]+'7'+report.time[21:]+'"')
+                # testing stuff:
                 #print report.time
                 #gpstime = dateutil.parser.parse(report.time)
                 #print gpstime.isoformat('T')
                 #print datetime.datetime.now().isoformat('T')
-                os.system('date --set="'+report.time+'"')
                 # connect to supervisor
                 supervisord = xmlrpclib.Server('http://localhost:9001/RPC2')
                 # start the watcher daemon
