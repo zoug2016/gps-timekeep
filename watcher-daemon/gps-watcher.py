@@ -65,7 +65,8 @@ def generate_html_file():
     gps_info = str(gpsd)
     gps_has_fix = "Yes" if gps_has_signal else "No"
     ntp_info = subprocess.check_output(["ntpq", "-pn"], stderr=subprocess.STDOUT)
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.utcnow().isoformat('T')
+    # .strftime("%Y-%m-%dT%H:%M:%S.%f %Z")
     # write the output file, substituting the variables
     fout = open(HTML_OUTPUT_DIR+HTML_OUTPUT_FILE, "w")
     fout.write(html_template.format(**locals()))

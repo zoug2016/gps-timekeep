@@ -8,7 +8,7 @@
     <blockquote><pre>{gps_info}</pre></blockquote>
     <h3>Current server time</h3>
     <blockquote>
-      {current_time} (when this page was generated, will differ from the GPS time!)
+      {current_time} UTC (when this page was generated, will differ from the GPS time! Also, it is UTC, not local!)
     </blockquote>
     <h3>NTP daemon info</h3>
     <blockquote><pre>{ntp_info}</pre></blockquote>
@@ -26,7 +26,8 @@
     <a href="#" onclick="javascript:event.target.port=9001">Supervisor (daemon status/management)</a>
     <blockquote>Notes:
       <ul>
-        <li><i>gpsd</i>, <i>gps-watcher</i> and <i>lighttpd</i> should be always running</li>
+        <li><i>gpsd</i> and <i>lighttpd</i> should be always running, <i>gps-watcher</i> also, a couple of second after boot</li>
+        <li><i>time-from-gps-oneshot</i> is a "startup script", so running at the start and then should be "Exited"</li>
         <li><i>gps-watcher</i> needs to be restarted after every restart of <i>gpsd</i></li>
         <li><i>gps-watcher</i> will start <i>ntpd</i> and <i>rpi_gpio_ntp</i> if GPS has a fix (in 2-3 seconds)</li>
         <li><i>gps-watcher</i> will stop <i>ntpd</i> and <i>rpi_gpio_ntp</i> if GPS does <i>not</i> have a fix</li>
