@@ -20,6 +20,8 @@ fout.write("""
   <body>
     <h1>ntpi info</h1>
     <h3>No GPS connection yet</h3>
+    <a href="/cgi-bin/serverconfig.py">Further server info and configuration</a>
+    <blockquote>(Will take a second or two to load.)</blockquote>
   </body>
 </html>
 """)
