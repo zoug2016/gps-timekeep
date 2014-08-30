@@ -25,6 +25,11 @@ if "reboot-button" in form:
     print "<h1>Rebooting now!</h1></body></html>"
     subprocess.Popen(["/sbin/reboot"])
     sys.exit()
+# if poweroff requested, just print a message and exit
+if "poweroff-button" in form:
+    print "<h1>Powering off now!</h1></body></html>"
+    subprocess.Popen(["/sbin/poweroff"])
+    sys.exit()
 
 # gather system info
 ifconfig = subprocess.check_output(["/sbin/ifconfig"], stderr=subprocess.STDOUT)
@@ -108,7 +113,10 @@ print """
 <h3>Reboot the machine</h3>
 <blockquote>
 <form method="post" action="serverconfig.py">
-  <p><input type="submit" value="Reboot!" name="reboot-button"></p>
+  <p>
+    <input type="submit" value="Reboot!" name="reboot-button">
+    <input type="submit" value="Power Off!" name="poweroff-button">
+  </p>
 </form>
 </blockquote>
 """
