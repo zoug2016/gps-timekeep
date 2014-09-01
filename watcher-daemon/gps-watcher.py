@@ -15,6 +15,7 @@ import os
 # declare global vars and constants
 gpsd = None
 gps_has_signal = None
+gps_had_signal_last = None
 ntpd_running = None
 rpi_gpio_ntp_running = None
 
@@ -77,7 +78,6 @@ def generate_html_file():
 if os.path.isfile(SUPERVISOR_AUTH):
     with open(SUPERVISOR_AUTH) as f:
         supervisor_namepass = f.readline().strip() + "@"
-    print "is"
 else:
     supervisor_namepass = ""
 
@@ -120,6 +120,8 @@ if __name__ == '__main__':
         time.sleep(3) # wait for a few reports to come in, to get a possible fix
                       # so that we don't kill ntpd unnecessarily
 
+        print datetime.datetime.utcnow().isoformat('T') + ": started"
+
         # main infinite loop
         while True:
             # does GPS have a fix?
@@ -144,6 +146,10 @@ if __name__ == '__main__':
 
             #os.system('clear')
             #print gpsd
+
+            if gps_had_signal_last != gps_has_signal:
+                print datetime.datetime.utcnow().isoformat('T') + ": GPS fix changed. Currently? " + ("Yes" if gps_has_signal else "No")
+            gps_had_signal_last = gps_has_signal
 
             # wait for X seconds until the next cycle
             time.sleep(2)
