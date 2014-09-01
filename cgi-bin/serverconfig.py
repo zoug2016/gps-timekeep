@@ -111,6 +111,9 @@ print """
 # password instructions
 print """
 <h3>Changing the password ...</h3>
+<blockquote>
+<p>... can be done <a href="/cgi-bin/password.py">here</a>.</p>
+</blockquote>
 """
 
 # reboot button

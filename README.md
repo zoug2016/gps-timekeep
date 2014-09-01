@@ -82,7 +82,16 @@ to configure `supervisord`, and restart it
 
 Now you should have access to a basic info web page (on port `80`) and to `supervisord` web interface (on port `9001`).
 
-The "Further info and configuration" webpage, as well as access to `supervisord`, is password protected (don't feel protected by this, it's not really secure). The name:pass is `admin:muflon`. If you want to change this, you need to edit two places: `/etc/supervisor/conf.d/daemons.conf` and `/opt/gps-timekeep/auth`. They need to match!
+## Password protection
+
+The "Further info and configuration" webpage, as well as access to `supervisord`, is password protected (don't feel protected by this, it's not really secure). The name:pass is `admin:muflon`. There is a web form to change this, but making it work is another privilege escalation (see also "Optional extras" below), so requires making two files writable by the `lighttpd` process. So:
+
+	sudo chgrp www-data /etc/supervisor/conf.d/daemons.conf
+	sudo chown g+w /etc/supervisor/conf.d/daemons.conf
+
+The other file, `/opt/gps-timekeep/auth` should be set up OK already, but just in case it isn't:
+
+	chmod 0666 /opt/gps-timekeep/auth
 
 If you want to remove the password protection:
 
