@@ -108,6 +108,11 @@ print """
 """ % (interfaces_contents)
 # cgi.escape(message)
 
+# password instructions
+print """
+<h3>Changing the password ...</h3>
+"""
+
 # reboot button
 print """
 <h3>Reboot the machine</h3>

@@ -7,6 +7,8 @@ import time
 #import datetime
 #import dateutil.parser
 
+SUPERVISOR_AUTH = "auth"
+
 # write a temporary html report
 HTML_OUTPUT_DIR = "/run/www"
 HTML_OUTPUT_FILE = "/index.html"
@@ -34,6 +36,14 @@ time.sleep(1)
 session = gps.gps("localhost", "2947")
 session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
 
+# preparation: read the supervisor user and pass
+if os.path.isfile(SUPERVISOR_AUTH):
+    with open(SUPERVISOR_AUTH) as f:
+        supervisor_namepass = f.readline().strip() + "@"
+else:
+    supervisor_namepass = ""
+
+
 # main loop: wait for a time report from GPS
 while True:
     try:
@@ -52,7 +62,7 @@ while True:
                 #print gpstime.isoformat('T')
                 #print datetime.datetime.now().isoformat('T')
                 # connect to supervisor
-                supervisord = xmlrpclib.Server('http://localhost:9001/RPC2')
+                supervisord = xmlrpclib.Server("http://"+supervisor_namepass+"localhost:9001/RPC2")
                 # start the watcher daemon
                 supervisord.supervisor.startProcess('gps-watcher')
                 break

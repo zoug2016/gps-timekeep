@@ -25,6 +25,8 @@ HTML_OUTPUT_DIR = "/run/www"
 HTML_OUTPUT_FILE = "/index.html"
 HTML_TEMPLATE_FILE = "index.template.html"
 
+SUPERVISOR_AUTH = "auth"
+
 # auxiliary functions: for supervisord
 supervisor_states = {
         0: False,   # stopped
@@ -55,9 +57,8 @@ if not os.path.exists(HTML_OUTPUT_DIR):
     os.makedirs(HTML_OUTPUT_DIR)
 
 # preparation: read the html template file
-fin = open(HTML_TEMPLATE_FILE)
-html_template = fin.read()
-fin.close()
+with open(HTML_TEMPLATE_FILE) as f:
+    html_template = f.read()
 
 # auxiliary function: generate a webpage with basic gps/ntpd info
 def generate_html_file():
@@ -72,8 +73,16 @@ def generate_html_file():
     fout.write(html_template.format(**locals()))
     fout.close()
 
+# preparation: read the supervisor user and pass
+if os.path.isfile(SUPERVISOR_AUTH):
+    with open(SUPERVISOR_AUTH) as f:
+        supervisor_namepass = f.readline().strip() + "@"
+    print "is"
+else:
+    supervisor_namepass = ""
+
 # connect to supervisor
-supervisord = xmlrpclib.Server('http://localhost:9001/RPC2')
+supervisord = xmlrpclib.Server("http://"+supervisor_namepass+"localhost:9001/RPC2")
 
 # this class does the threaded polling of the gpsd daemon
 class GpsPoller(threading.Thread):
