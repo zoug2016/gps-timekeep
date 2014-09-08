@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: UTF-8 -*-
 #
 # basic skeleton from:
 #   Dan Mandle http://dan.mandle.me September 2012

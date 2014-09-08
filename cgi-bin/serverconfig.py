@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
 import subprocess
 import sys
@@ -6,7 +7,7 @@ import sys
 import cgi
 import cgitb; cgitb.enable()  # for troubleshooting
 
-print "Content-Type: text/html"     # HTML is following
+print "Content-Type: text/html;charset=utf-8"     # HTML is following
 print                               # blank line, end of headers
 
 # print html header

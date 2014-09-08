@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
 import subprocess
 import sys
@@ -34,7 +35,7 @@ and the same with the other file.
 </body></html>
 """
 
-print "Content-Type: text/html"     # HTML is following
+print "Content-Type: text/html;charset=utf-8"     # HTML is following
 print                               # blank line, end of headers
 
 # print html header
